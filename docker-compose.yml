@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+    dev:
+        container_name: nestjs_api_dev
+        image: nestjs-api-dev:1.0.0
+        build:
+            context: .
+            target: development
+            dockerfile: ./Dockerfile
+        command: npm run start:debug
+        ports:
+            - 3000:3000
+            - 9229:9229
+        networks:
+            - nestjs-network
+        volumes:
+            - .:/usr/src/app
+            - /usr/src/app/node_modules
+        restart: unless-stopped
+    postgres:
+      container_name: postgres_container
+      image: postgres
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: changeme
+        PGDATA: /data/postgres
+      volumes:
+        - postgres:/data/postgres
+      ports:
+        - "5432:5432"
+      networks:
+        - nestjs-network
+      restart: unless-stopped
+    pgadmin:
+      container_name: pgadmin_container
+      image: dpage/pgadmin4
+      environment:
+        PGADMIN_DEFAULT_EMAIL: user-pgadmin4@pgadmin.org
+        PGADMIN_DEFAULT_PASSWORD: changeme
+        PGADMIN_CONFIG_SERVER_MODE: 'False'
+      volumes:
+        - pgadmin:/var/lib/pgadmin
+
+      ports:
+        - 5050:80
+      networks:
+        - nestjs-network
+      restart: unless-stopped
+
+    # prod:
+    #     container_name: nestjs_api_prod
+    #     image: nestjs-api-prod:1.0.0
+    #     build:
+    #         context: .
+    #         target: production
+    #         dockerfile: ./Dockerfile
+    #     command: npm run start:prod
+    #     ports:
+    #         - 3000:3000
+    #         - 9229:9229
+    #     networks:
+    #         - nestjs-network
+    #     volumes:
+    #         - .:/usr/src/app
+    #         - /usr/src/app/node_modules
+    #     restart: unless-stopped
+
+networks:
+    nestjs-network:
+
+
+volumes:
+    postgres:
+    pgadmin:
